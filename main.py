@@ -1,5 +1,8 @@
 import subprocess
 from datetime import datetime
+from typing import Generator
+
+import sys
 
 
 def parse_terminal_output(output: str) -> list[str]:
@@ -12,7 +15,7 @@ def parse_terminal_output(output: str) -> list[str]:
     return output
 
 
-def get_lines_and_values(lines: list[str]) -> dict[int:str]:
+def get_lines_and_values(lines: Generator) -> dict[int:str]:
     result = {}
 
     for line in lines:
@@ -26,46 +29,40 @@ def get_lines_and_values(lines: list[str]) -> dict[int:str]:
     return result
 
 
-def run_command(search_text: str, file_path: str, file_output_path: str = None) -> str:
+def get_file_content(output_file__path: str):
+    with open(output_file__path, 'r') as file:
+        for line in file:
+            yield line
+
+
+def run_command(search_text: str, file_path: str, output_file__path: str = None) -> None:
     command = "ag"
-    # args = ["--numbers", '--nocolor', "--nobreak", "--nogroup", search_text, file_path]
-    args = ["--numbers", '--nocolor', "--nobreak", "--nogroup", search_text, file_path, ">", "f.txt"]
+    args = ["--numbers", '--nocolor', "--nobreak", "--nogroup", search_text, file_path]
     shell_command = [command, *args]
 
-    if file_output_path:
-        with open(file_output_path, 'w') as file:
-            subprocess.run(
-                shell_command,
-                stdout=file,
-                text=True
-            )
-
-        with open(file_output_path, 'r') as file:
-            output = file.readlines()
-
-    else:
-        output = subprocess.run(
+    with open(output_file__path, 'w') as file:
+        subprocess.run(
             shell_command,
-            stdout=subprocess.DEVNULL,
+            stdout=file,
             text=True
         )
-        output = output.stdout
-
-    return output
 
 
 def main():
     start_time = datetime.now()
+    output_file__path = 'output.txt'
 
-    command_output = run_command(
+    run_command(
         search_text="Suco de cevadiss, é um leite divinis, qui tem lupuliz, matis, aguis e fermentis",
         file_path='large_file.txt',
-        # file_output_path='output.txt'
+        output_file__path=output_file__path
     )
 
-    response = parse_terminal_output(output=command_output)
-    matched_texts = get_lines_and_values(lines=response)
-    print(matched_texts)
+    lines = get_file_content(output_file__path=output_file__path)
+
+    # response = parse_terminal_output(output=lines)
+    matched_texts = get_lines_and_values(lines=lines)
+    # print(matched_texts)
 
     end_time = datetime.now()
     print(f'\nExecution duration: {end_time - start_time}')
