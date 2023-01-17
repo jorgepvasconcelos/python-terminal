@@ -2,31 +2,11 @@ import subprocess
 from datetime import datetime
 from typing import Generator
 
-import sys
-
-
-def parse_terminal_output(output: str) -> list[str]:
-    if isinstance(output, list):
-        output = [v.replace('\n', '') for v in output]
-        return output
-
-    output = output.split('\n')
-    output = [v for v in output if not v == '']
-    return output
-
-
-def get_lines_and_values(lines: Generator) -> dict[int:str]:
-    result = {}
-
+def get_lines_and_values(lines: Generator) -> list:
+    result_list = []
     for line in lines:
-        colon_index = line.index(":")
-
-        line_number = int(line[:colon_index])
-        line_value = line[colon_index + 1:]
-
-        result[line_number] = line_value
-
-    return result
+        result_list.append(line.replace("\n", ""))
+    return result_list
 
 
 def get_file_content(output_file__path: str):
@@ -55,14 +35,11 @@ def main():
     run_command(
         search_text="Suco de cevadiss, é um leite divinis, qui tem lupuliz, matis, aguis e fermentis",
         file_path='large_file.txt',
-        output_file__path=output_file__path
-    )
+        output_file__path=output_file__path)
 
     lines = get_file_content(output_file__path=output_file__path)
-
-    # response = parse_terminal_output(output=lines)
     matched_texts = get_lines_and_values(lines=lines)
-    # print(matched_texts)
+    print(matched_texts)
 
     end_time = datetime.now()
     print(f'\nExecution duration: {end_time - start_time}')
