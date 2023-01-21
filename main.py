@@ -24,7 +24,6 @@ def run_command(search_text: str, file_path: str, output_file__path: str = None)
         subprocess.run(
             shell_command,
             stdout=file,
-            text=True
         )
 
 
@@ -39,10 +38,10 @@ def main():
 
     lines = get_file_content(output_file__path=output_file__path)
     matched_texts = get_lines_and_values(lines=lines)
-    print(matched_texts)
 
     end_time = datetime.now()
     print(f'\nExecution duration: {end_time - start_time}')
+    print("Matchs: ", len(matched_texts))
 
 
 if __name__ == '__main__':
